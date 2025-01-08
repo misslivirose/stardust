@@ -3,15 +3,17 @@
 # Libraries and Frameworks
 from fastapi import FastAPI, HTTPException, Depends, Request
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.websockets import WebSocket, WebSocketDisconnect
 import uvicorn
 import asyncio
 import uuid
 import requests
+import json
 from fastapi.staticfiles import StaticFiles
 
 # Initialize FastAPI Application
@@ -29,6 +31,8 @@ app.add_middleware(
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+active_connections: Dict[str, List[WebSocket]] = {}
+
 # OAuth2 Authentication Stub
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -39,12 +43,15 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 # Models for User Input and Output
 class QueryRequest(BaseModel):
     query: str
-    user_id: Optional[str] = None
+    session_id: Optional[str] = None
+    room_id: str
 
 class QueryResponse(BaseModel):
-    user_id: str
+    session_id: str
+    room_id: str
     query: str
     retrieved_documents: List[str]
+    history: List[Dict[str, str]] 
     generated_response: str
 
 # In-Memory Data Store (Replace with a Database in Production)
@@ -55,6 +62,8 @@ data_store = {
         "Document 3: Retrieval-Augmented Generation enhances LLM outputs."
     ]
 }
+
+chat_histories = {}
 
 # Placeholder for Document Vectorization and Search (Implement FAISS, Pinecone, etc.)
 def retrieve_documents(query: str, top_k: int = 3):
@@ -85,52 +94,73 @@ def generate_response(query: str, retrieved_docs: List[str]):
     else:
         raise HTTPException(status_code=500, detail=f"Ollama Error: {response.text}")
 
-@app.post("/query", response_model=QueryResponse)
-def process_query(query_request: QueryRequest):
-    query = query_request.query
-    print(query)
-
-    # Retrieve relevant documents
-    # retrieved_docs = retrieve_documents(query)
-
-    # if not retrieved_docs:
-        # raise HTTPException(status_code=404, detail="No relevant documents found.")
-
-    # Generate a response using retrieved documents
-    generated_response = generate_response(query, [])
-
-    return QueryResponse(
-        user_id="anonymous_user",  # Simplified user ID for now
-        query=query,
-        retrieved_documents=retrieved_docs,
-        generated_response=generated_response
-    )
-    
-async def stream_generate_response(query: str):
-    url = "http://localhost:11434/api/generate"
-    params = {"model": "llama3.2", "prompt": query}
-    
-    with requests.post(url, json=params, stream=True) as response:
-        if response.status_code != 200:
-            yield f"Ollama Error: {response.text}"
-            return
-
-        for line in response.iter_lines():
-            if line:
-                try:
-                    parsed_line = line.decode("utf-8")
-                    yield parsed_line
-                except Exception as e:
-                    yield f"Error parsing response: {str(e)}"
-
 @app.post("/query/stream")
 async def process_query_stream(query_request: QueryRequest):
     query = query_request.query
-    return StreamingResponse(
-        stream_generate_response(query),
-        media_type="text/plain"
-    )
+    room_id = query_request.room_id
+    session_id = query_request.session_id
 
+    # Initialize chat history for the room if it doesn't exist
+    if room_id not in chat_histories:
+        chat_histories[room_id] = []
+
+    chat_histories[room_id].append({
+        "user": f"{session_id}: {query}",
+        "ai": ""  # Placeholder until complete response is generated
+    })
+
+    async def stream_generate_response(query: str, room_id: str):
+        url = "http://localhost:11434/api/generate"
+        params = {"model": "llama3.2", "prompt": query}
+        with requests.post(url, json=params, stream=True) as response:
+            if response.status_code != 200:
+                yield f"Ollama Error: {response.text}"
+                return
+
+            for line in response.iter_lines():
+                if line:
+                    try:
+                        parsed_line = line.decode("utf-8")
+                        try:
+                            json_line = json.loads(parsed_line)
+                            if "response" in json_line:
+                                chat_histories[room_id][-1]["ai"] += json_line["response"]
+                        except json.JSONDecodeError:
+                            chat_histories[room_id][-1]["ai"] += parsed_line.strip()
+                        await broadcast_updates(room_id)
+                        yield parsed_line
+                    except Exception as e:
+                        yield f"Error parsing response: {str(e)}"
+
+    async def broadcast_updates(room_id: str):
+        if room_id in active_connections:
+            for connection in active_connections[room_id]:
+                try:
+                    await connection.send_json({"history": chat_histories[room_id]})
+                except Exception as e:
+                    logging.error(f"Error broadcasting message: {e}")
+
+    return StreamingResponse(stream_generate_response(query, room_id), media_type="text/plain")
+
+
+
+@app.websocket("/ws/{room_id}")
+async def websocket_endpoint(websocket: WebSocket, room_id: str):
+    await websocket.accept()
+    if room_id not in active_connections:
+        active_connections[room_id] = []
+    active_connections[room_id].append(websocket)
+    try:
+        while True:
+            # Keep connection alive, waiting for events
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        active_connections[room_id].remove(websocket)
+
+async def broadcast_message(room_id: str, message: dict):
+    if room_id in active_connections:
+        for connection in active_connections[room_id]:
+            await connection.send_json(message)
 
 # Health Check Endpoint
 @app.get("/health")

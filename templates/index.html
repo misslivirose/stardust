@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chat</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
- 
+
     <div class="chat-header">
         <img src="/static/logo.png" alt="Logo" class="chat-logo">
     </div>
@@ -23,72 +25,106 @@
     <div id="responseContainer"></div>
 
     <script>
- 
-async function sendQuery() {
-    const queryInput = document.getElementById('user-input').value;
-    if (!queryInput) return;
+        let roomId = localStorage.getItem('room_id') || prompt('Enter a chat room ID:');
+        if (!roomId) {
+            roomId = 'default-room';
+        }
+        localStorage.setItem('room_id', roomId);
 
-    const chatBox = document.getElementById('chat-box');
+        const sessionId = localStorage.getItem('session_id') || generateSessionId();
+        localStorage.setItem('session_id', sessionId);
 
-    // Append user message to chat box
-    const userMessage = document.createElement('div');
-    userMessage.className = 'message user-message';
-    userMessage.innerHTML = `<span class="user">You:</span> ${queryInput}`;
-    chatBox.appendChild(userMessage);
-
-    // Create a placeholder for AI response
-    const aiMessage = document.createElement('div');
-    aiMessage.className = 'message ai-message';
-    aiMessage.innerHTML = `<span class="ai">AI:</span> `;
-    chatBox.appendChild(aiMessage);
-
-    try {
-        // Send query to the backend
-        const response = await fetch('/query/stream', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: queryInput }),
-        });
-
-        if (!response.ok) {
-            aiMessage.innerHTML += `<span style="color: red;">Error: Unable to fetch response</span>`;
-            return;
+        function generateSessionId() {
+            return 'session-' + Math.random().toString(36).substr(2, 9);
         }
 
-        // Read the streamed response
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder('utf-8');
-        let done = false;
+        const socket = new WebSocket(`ws://${window.location.host}/ws/${roomId}`);
 
-        while (!done) {
-            const { value, done: readerDone } = await reader.read();
-            done = readerDone;
+        socket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = ''; // Clear existing messages
 
-            if (value) {
-                const chunk = decoder.decode(value, { stream: true });
-                try {
-                    const json = JSON.parse(chunk);
-                    if (json.response) {
-                        aiMessage.innerHTML += json.response;
-                    }
-                } catch (e) {
-                    console.error("Error parsing chunk:", chunk, e);
+            // Append updated chat history
+            data.history.forEach(message => {
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user-message';
+                userMessage.innerHTML = `<span class="user">${message.user}</span>`;
+                chatBox.appendChild(userMessage);
+
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message ai-message';
+                aiMessage.innerHTML = `<span class="ai">${message.ai}</span>`;
+                chatBox.appendChild(aiMessage);
+            });
+        }
+
+        async function sendQuery() {
+            const queryInput = document.getElementById('user-input').value;
+            if (!queryInput) return;
+
+            const chatBox = document.getElementById('chat-box');
+
+            // Append user message to chat box
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user-message';
+            userMessage.innerHTML = `<span class="user">You:</span> ${queryInput}`;
+            chatBox.appendChild(userMessage);
+
+            // Create a placeholder for AI response
+            const aiMessage = document.createElement('div');
+            aiMessage.className = 'message ai-message';
+            aiMessage.innerHTML = `<span class="ai">AI:</span> `;
+            chatBox.appendChild(aiMessage);
+
+            try {
+                // Send query to the backend
+                const response = await fetch('/query/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: queryInput, session_id: sessionId, room_id: roomId }),
+                });
+
+                if (!response.ok) {
+                    aiMessage.innerHTML += `<span style="color: red;">Error: Unable to fetch response</span>`;
+                    return;
                 }
+
+                // Read the streamed response
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let done = false;
+
+                while (!done) {
+                    const { value, done: readerDone } = await reader.read();
+                    done = readerDone;
+
+                    if (value) {
+                        const chunk = decoder.decode(value, { stream: true });
+                        try {
+                            const json = JSON.parse(chunk);
+                            if (json.response) {
+                                aiMessage.innerHTML += json.response;
+                            }
+                        } catch (e) {
+                            console.error("Error parsing chunk:", chunk, e);
+                        }
+                    }
+                }
+            } catch (error) {
+                aiMessage.innerHTML += `<span style="color: red;">Error: ${error.message}</span>`;
             }
+
+            // Scroll to the bottom of the chat box
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Clear the input box
+            document.getElementById('user-input').value = '';
         }
-    } catch (error) {
-        aiMessage.innerHTML += `<span style="color: red;">Error: ${error.message}</span>`;
-    }
-
-    // Scroll to the bottom of the chat box
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    // Clear the input box
-    document.getElementById('user-input').value = '';
-}
 
 
 
     </script>
 </body>
+
 </html>
