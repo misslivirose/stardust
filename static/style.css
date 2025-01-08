@@ -1,0 +1,112 @@
+/* General Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden; /* Prevent scrolling outside the chat container */
+}
+
+/* Main Chat Container */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 800px; /* Fixed width for desktop */
+    height: 90vh; /* Occupies most of the viewport height */
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Prevent content from overflowing the container */
+}
+
+/* Chat Box */
+#chat-box {
+    flex-grow: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Messages */
+.message {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 75%;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+/* User Messages */
+.user-message {
+    background-color: #e9f5ff;
+    margin-left: auto; /* Aligns to the right */
+    text-align: left; /* Ensures text inside aligns correctly */
+}
+
+.user-message .user {
+    font-weight: bold;
+    color: #007BFF;
+}
+
+/* AI Messages */
+.ai-message {
+    background-color: #f0f0f0;
+    margin-right: auto; /* Aligns to the left */
+    text-align: left;
+}
+
+.ai-message .ai {
+    font-weight: bold;
+    color: #DBB569;
+}
+
+/* Input Section */
+textarea#user-input {
+    width: calc(100% - 20px); /* Keeps the textarea inside the container */
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: none;
+    font-size: 16px;
+    line-height: 1.5;
+    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #DBB569;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #9B542A;
+}
+
+/* Scrollbar Styling */
+#chat-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chat-box::-webkit-scrollbar-thumb {
+    background-color: #bbb;
+    border-radius: 4px;
+}
+
+#chat-box::-webkit-scrollbar-thumb:hover {
+    background-color: #888;
+}
+
