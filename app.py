@@ -45,6 +45,8 @@ class QueryRequest(BaseModel):
     query: str
     session_id: Optional[str] = None
     room_id: str
+    friendly_name: Optional[str] = None
+
 
 class QueryResponse(BaseModel):
     session_id: str
@@ -105,8 +107,8 @@ async def process_query_stream(query_request: QueryRequest):
         chat_histories[room_id] = []
 
     chat_histories[room_id].append({
-        "user": f"{session_id}: {query}",
-        "ai": ""  # Placeholder until complete response is generated
+        "user": f"{query_request.friendly_name or session_id}: {query}",
+        "ai": "Stardust: "  # Placeholder until complete response is generated
     })
 
     async def stream_generate_response(query: str, room_id: str):

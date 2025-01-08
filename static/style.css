@@ -38,7 +38,7 @@ body {
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 8px;
-    max-width: 75%;
+    max-width: 100%;
     line-height: 1.5;
     word-wrap: break-word;
 }
@@ -52,7 +52,6 @@ body {
 
 .user-message .user {
     font-weight: bold;
-    color: #007BFF;
 }
 
 /* AI Messages */
@@ -63,8 +62,8 @@ body {
 }
 
 .ai-message .ai {
-    font-weight: bold;
-    color: #DBB569;
+    color: #514D46;
+    font-family:monospace;
 }
 
 /* Input Section */
@@ -110,3 +109,18 @@ button:hover {
     background-color: #888;
 }
 
+.message.self {
+    text-align: right;
+    background-color: #daf5ff;
+    border-radius: 10px 10px 0 10px;
+    margin: 5px;
+    color: #007BFF;
+}
+
+.message.other {
+    text-align: left;
+    background-color: #e2f7ed;
+    border-radius: 10px 10px 10px 0;
+    margin: 5px;
+    color: #5db48a
+}

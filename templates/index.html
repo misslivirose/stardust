@@ -12,6 +12,7 @@
 
     <div class="chat-header">
         <img src="/static/logo.png" alt="Logo" class="chat-logo">
+        <input id="friendly-name" type="text" placeholder="Enter your name" />
     </div>
 
     <div class="chat-container">
@@ -38,6 +39,7 @@
             return 'session-' + Math.random().toString(36).substr(2, 9);
         }
 
+        const friendlyName = document.getElementById('friendly-name').value;
         const socket = new WebSocket(`ws://${window.location.host}/ws/${roomId}`);
 
         socket.onmessage = function (event) {
@@ -47,8 +49,9 @@
 
             // Append updated chat history
             data.history.forEach(message => {
+                const isSelf = message.user.startsWith(friendlyName);
                 const userMessage = document.createElement('div');
-                userMessage.className = 'message user-message';
+                userMessage.className = isSelf ? 'message user-message self' : 'message user-message other';
                 userMessage.innerHTML = `<span class="user">${message.user}</span>`;
                 chatBox.appendChild(userMessage);
 
@@ -67,7 +70,7 @@
 
             // Append user message to chat box
             const userMessage = document.createElement('div');
-            userMessage.className = 'message user-message';
+            userMessage.className = 'message user-message self';
             userMessage.innerHTML = `<span class="user">You:</span> ${queryInput}`;
             chatBox.appendChild(userMessage);
 
@@ -82,7 +85,7 @@
                 const response = await fetch('/query/stream', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: queryInput, session_id: sessionId, room_id: roomId }),
+                    body: JSON.stringify({ query: queryInput, session_id: sessionId, room_id: roomId, friendly_name: friendlyName }),
                 });
 
                 if (!response.ok) {
