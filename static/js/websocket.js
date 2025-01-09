@@ -13,7 +13,7 @@ export function connectWebSocket(roomId, onMessageCallback) {
 
     socket.onmessage = function (event) {
         try {
-            console.log("WebSocket message received:", event.data);
+            // console.log("WebSocket message received:", event.data);
             const data = JSON.parse(event.data);
             onMessageCallback(data);
         } catch (e) {

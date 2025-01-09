@@ -13,6 +13,10 @@ export function getSessionId() {
     return sessionId;
 }
 
+export function setSessionId(newId) {
+    localStorage.setItem('session_id', newId)
+}
+
 function generateSessionId() {
     return 'session-' + Math.random().toString(36).substr(2, 9);
 }
