@@ -13,15 +13,17 @@ body {
 
 /* Main Chat Container */
 .chat-container {
+    position: fixed; /* Keeps the chat container pinned to a fixed spot */
+    top: 10%; /* Adjust the vertical positioning */
+    right: 20px; /* Aligns the container to the right edge */
+    width: 800px; /* Set an appropriate width */
+    height: 80%; /* Adjust height as needed */
+    background-color: #f9f9f9; /* Optional: Set a background color */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for aesthetics */
+    border-left: 1px solid #ddd; /* Optional: A border for separation */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    width: 800px; /* Fixed width for desktop */
-    height: 90vh; /* Occupies most of the viewport height */
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Prevent content from overflowing the container */
+    padding: 10px;
 }
 
 /* Chat Box */
@@ -79,10 +81,14 @@ textarea#user-input {
     box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+.chat-logo {
+    width: 200px;
+}
+
 button {
     margin: 10px;
     padding: 10px 20px;
-    background-color: #DBB569;
+    background-color: #7177c9;
     color: white;
     border: none;
     border-radius: 8px;
@@ -92,7 +98,7 @@ button {
 }
 
 button:hover {
-    background-color: #9B542A;
+    background-color: #344f5a;
 }
 
 /* Scrollbar Styling */
@@ -123,4 +129,18 @@ button:hover {
     border-radius: 10px 10px 10px 0;
     margin: 5px;
     color: #5db48a
+}
+
+.page-header {
+    position: absolute; 
+    top: 10%; 
+    left: 20px;
+    z-index: 10; 
+    background-color: #fff; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px 20px; 
+    border-bottom: 1px solid #ddd; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
 }

@@ -30,3 +30,10 @@ window.setNewId = () => {
 window.getSessionId = () => {
     return sessionId;
 }
+
+document.getElementById('user-input').addEventListener('keypress', function (event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault(); // Prevent line break
+        sendQuery();
+    }
+});
