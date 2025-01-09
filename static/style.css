@@ -59,11 +59,11 @@ body {
     background-color: #f0f0f0;
     margin-right: auto; /* Aligns to the left */
     text-align: left;
+    font-family:monospace;
 }
 
 .ai-message .ai {
     color: #514D46;
-    font-family:monospace;
 }
 
 /* Input Section */

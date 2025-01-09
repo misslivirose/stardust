@@ -42,25 +42,49 @@
         const friendlyName = document.getElementById('friendly-name').value;
         const socket = new WebSocket(`ws://${window.location.host}/ws/${roomId}`);
 
+        socket.onopen = function () {
+            console.log("WebSocket connection established.");
+        };
+
+        socket.onerror = function (error) {
+            console.error("WebSocket error:", error);
+        };
+
+
         socket.onmessage = function (event) {
-            const data = JSON.parse(event.data);
+            try {
+                console.log("WebSocket message received:", event.data); // Debugging log
+                const data = JSON.parse(event.data);
+                if (data.history) {
+                    updateChatBox(data.history);
+                }
+            } catch (e) {
+                console.error("Error parsing WebSocket message:", event.data, e);
+            }
+        };
+
+        function updateChatBox(history) {
             const chatBox = document.getElementById('chat-box');
             chatBox.innerHTML = ''; // Clear existing messages
 
-            // Append updated chat history
-            data.history.forEach(message => {
-                const isSelf = message.user.startsWith(friendlyName);
+            history.forEach(message => {
                 const userMessage = document.createElement('div');
-                userMessage.className = isSelf ? 'message user-message self' : 'message user-message other';
-                userMessage.innerHTML = `<span class="user">${message.user}</span>`;
+                userMessage.className = 'message user-message';
+                userMessage.innerHTML = `<span class="user">${message.user}:</span> ${message.message}`;
                 chatBox.appendChild(userMessage);
 
-                const aiMessage = document.createElement('div');
-                aiMessage.className = 'message ai-message';
-                aiMessage.innerHTML = `<span class="ai">${message.ai}</span>`;
-                chatBox.appendChild(aiMessage);
+                if (message.ai) {
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message ai-message';
+                    aiMessage.innerHTML = `<span class="ai">AI:</span> ${message.ai}`;
+                    chatBox.appendChild(aiMessage);
+                }
             });
+
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
         }
+
+
 
         async function sendQuery() {
             const queryInput = document.getElementById('user-input').value;
@@ -82,7 +106,7 @@
 
             try {
                 // Send query to the backend
-                const response = await fetch('/query/stream', {
+                const response = await fetch('/chat/query/stream', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query: queryInput, session_id: sessionId, room_id: roomId, friendly_name: friendlyName }),
