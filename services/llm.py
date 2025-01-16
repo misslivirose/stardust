@@ -47,14 +47,3 @@ def generate_response(query: str, room_id: str):
                             yield {"response": decoded_line}
                     except Exception as e:
                         yield {"error": f"Error parsing response: {str(e)}"}
-
-def create_summary(text: str):
-    prompt = "Create a short summary of the following conversation. Include the names of the users who participated and key topics: ".join(text)
-
-    # Send the query to Ollama without streaming
-    params = {"model": "llama3.2", "prompt" : prompt}
-    with requests.post(url, json=params, stream=False) as response:
-        if response.status_code != 200:
-            yield {"error": response.text}
-        else:
-            return response

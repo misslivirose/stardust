@@ -1,5 +1,6 @@
 import requests
 chat_histories = {}
+url = "http://localhost:11434/api/generate" # TODO: Make this work in a single module
 
 def initialize_room(room_id: str):
     if room_id not in chat_histories:
