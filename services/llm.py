@@ -1,6 +1,24 @@
 import requests
 import json
-from services.prompt_builder import build_prompt
+from services.chat_history import chat_histories
+
+url = "http://localhost:11434/api/generate"
+
+def build_prompt(room_id: str, query: str) -> str:
+    # Retrieve history for the room
+    history = chat_histories.get(room_id, {}).get("history", [])
+
+    # Construct a conversational prompt
+    prompt = ""
+    for message in history:
+        prompt += f"{message['user']}: {message['message']}\n"
+        if message["ai"]:
+            prompt += f"assistant: {message['ai']}\n"
+
+    # Add the new user query
+    prompt += f"user: {query}\nassistant:"
+    return prompt
+
 
 def generate_response(query: str, room_id: str):
 
@@ -8,7 +26,6 @@ def generate_response(query: str, room_id: str):
     print(f"Generated prompt:\n{prompt}")
 
     # Send the query to the LLM API and stream the response.
-    url = "http://localhost:11434/api/generate"
     params = {"model": "llama3.2", "prompt": prompt}
     with requests.post(url, json=params, stream=True) as response:
         if response.status_code != 200:
@@ -30,3 +47,14 @@ def generate_response(query: str, room_id: str):
                             yield {"response": decoded_line}
                     except Exception as e:
                         yield {"error": f"Error parsing response: {str(e)}"}
+
+def create_summary(text: str):
+    prompt = "Create a short summary of the following conversation. Include the names of the users who participated and key topics: ".join(text)
+
+    # Send the query to Ollama without streaming
+    params = {"model": "llama3.2", "prompt" : prompt}
+    with requests.post(url, json=params, stream=False) as response:
+        if response.status_code != 200:
+            yield {"error": response.text}
+        else:
+            return response
