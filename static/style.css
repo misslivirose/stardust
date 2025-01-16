@@ -13,7 +13,6 @@ body {
 
 /* Main Chat Container */
 .chat-container {
-    position: fixed; /* Keeps the chat container pinned to a fixed spot */
     top: 10%; /* Adjust the vertical positioning */
     right: 20px; /* Aligns the container to the right edge */
     width: 800px; /* Set an appropriate width */
@@ -61,17 +60,17 @@ body {
     background-color: #f0f0f0;
     margin-right: auto; /* Aligns to the left */
     text-align: left;
-    font-family:monospace;
+    font-family: monospace;
 }
 
 .ai-message .ai {
-    color: #514D46;
+    color: #514d46;
 }
 
 /* Input Section */
 textarea#user-input {
     width: calc(100% - 20px); /* Keeps the textarea inside the container */
-    margin: 10px;
+    margin-top: 10px;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -120,7 +119,7 @@ button:hover {
     background-color: #daf5ff;
     border-radius: 10px 10px 0 10px;
     margin: 5px;
-    color: #007BFF;
+    color: #007bff;
 }
 
 .message.other {
@@ -128,19 +127,18 @@ button:hover {
     background-color: #e2f7ed;
     border-radius: 10px 10px 10px 0;
     margin: 5px;
-    color: #5db48a
+    color: #5db48a;
 }
 
 .page-header {
-    position: absolute; 
-    top: 10%; 
+    top: 10%;
     left: 20px;
-    z-index: 10; 
-    background-color: #fff; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 10px 20px; 
-    border-bottom: 1px solid #ddd; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    z-index: 10;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
