@@ -1,34 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI Chat</title>
+        <link rel="stylesheet" href="/static/style.css" />
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chat</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-
-<body>
-    <div class="page-header">
-        <h1>Project Stardust</h1>
-        <img src="/static/logo.png" alt="Logo" class="chat-logo">
-        <div id="info-panel">
-            <input id="friendly-name" type="text" />
-            <button onclick="setNewId()">Update</button>
+    <body>
+        <div class="page-header">
+            <h1>Project Stardust</h1>
+            <img src="/static/logo.png" alt="Logo" class="chat-logo" />
+            <div id="info-panel">
+                <input id="friendly-name" type="text" />
+                <button onclick="setNewId()">Update</button>
+            </div>
         </div>
-    </div>
 
-    <div class="chat-container">
-        <div id="chat-box">
-            <!-- Messages will be dynamically added here -->
+        <div class="chat-container">
+            <div id="chat-box">
+                <!-- Messages will be dynamically added here -->
+            </div>
+            <textarea
+                id="user-input"
+                placeholder="Type your message..."
+                rows="3"
+            ></textarea>
+            <button onclick="sendQuery()">Send</button>
         </div>
-        <textarea id="user-input" placeholder="Type your message..." rows="3"></textarea>
-        <button onclick="sendQuery()">Send</button>
-    </div>
-
-    <div id="responseContainer"></div>
-    <script src="/static/js/main.js" type="module"></script>
-
-</body>
-
+        <div id="responseContainer"></div>
+        <button id="light-mode-toggle">Toggle Appearance</button>
+        <script src="/static/js/main.js" type="module"></script>
+        <script>
+            const toggleButton = document.getElementById("light-mode-toggle");
+            const body = document.body;
+            toggleButton.addEventListener("click", () => {
+                body.classList.toggle("light-mode");
+            });
+        </script>
+    </body>
 </html>

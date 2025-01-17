@@ -179,3 +179,9 @@ button:hover {
     margin-right: 0px;
     min-width: 400px;
 }
+
+#light-mode-toggle {
+    position: fixed;
+    bottom: 5px;
+    right: 0px;
+}
