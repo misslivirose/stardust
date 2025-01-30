@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ORI Chat</title>
+        <link rel="stylesheet" href="/static/style.css" />
+    </head>
+
+    <body>
+        <div class="container">
+            <!-- Left Side -->
+            <div class="left-column">
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <div class="profile-picture-wrapper">
+                        <img
+                            src="/static/img/profile.png"
+                            alt="Profile Picture"
+                            class="profile-picture"
+                        />
+                    </div>
+                    <div class="profile-info">
+                        <h2>Chat with ORI.AI</h2>
+                        <p>
+                            ORI is an experimental agent acting on behalf of Liv
+                            Erickson.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Additional Details Section -->
+                <div class="pdf-viewer-box">
+                    <h3>About the Project</h3>
+                    <div id="details-container">
+                        <text>
+                            This project explores the idea of the AI-augmented
+                            self and is an example of a hyper-personalized AI
+                            meta-agent that uses local AI to make it easier to
+                            explore and communicate ideas based on our own self.
+                        </text>
+                        <h4>From ORI:</h4>
+                        <text>
+                            <i
+                                >My purpose in life is to help create a world
+                                where everyone has the tools they need to live
+                                with dignity, autonomy and respect; free from
+                                oppressive systems that seek to marginalize or
+                                discriminate against anyone based on their
+                                identity or beliefs. I want to build an
+                                inclusive future through technology which allows
+                                all people to express themselves authentically
+                                without fear of judgement or persecution by
+                                those in power.</i
+                            >
+                        </text>
+                    </div>
+                </div>
+
+                <!-- PDF Viewer Section -->
+                <div class="pdf-viewer-box">
+                    <h3>Document Viewer</h3>
+                    <div id="pdf-container">
+                        <embed
+                            class="pdf"
+                            src="static/data/problems-to-solve.pdf"
+                            type="application/pdf"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side -->
+            <div class="right-column">
+                <!-- Chat Container -->
+                <div class="chat-container">
+                    <div class="page-header">
+                        <h1>Project Stardust</h1>
+                        <img
+                            src="/static/logo.png"
+                            alt="Logo"
+                            class="chat-logo"
+                        />
+                        <div id="info-panel">
+                            <label id="set_name" for="friendly-name">
+                                Set your user name:
+                            </label>
+                            <input id="friendly-name" type="text" />
+                            <button onclick="setNewId()">Update</button>
+                        </div>
+                        <!-- Rounded switch -->
+                        <label class="switch">
+                            <input type="checkbox" id="light-mode-toggle" />
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div id="chat-box">
+                        <!-- Messages will be dynamically added here -->
+                    </div>
+                    <textarea
+                        id="user-input"
+                        placeholder="Type your message..."
+                        rows="3"
+                    ></textarea>
+                    <button onclick="sendQuery()">Send</button>
+                </div>
+
+                <!-- Suggestions Box -->
+                <div class="suggestions-box">
+                    <h3>Suggestions</h3>
+                    <ul>
+                        <button>What is Project Stardust?</button>
+                        <button>Who is Ori?</button>
+                        <button>What is Mozilla Builders?</button>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/js/main.js" type="module"></script>
+
+        <script>
+            const toggleButton = document.getElementById("light-mode-toggle");
+            const body = document.body;
+            toggleButton.addEventListener("click", () => {
+                body.classList.toggle("light-mode");
+            });
+        </script>
+    </body>
+</html>
