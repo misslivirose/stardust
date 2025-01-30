@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from utils.cors import configure_cors
-from routers import chat, websockets, html, recommendations
+from routers import chat, related, websockets, html, recommendations
 from fastapi.staticfiles import StaticFiles
 import logging
 
@@ -19,6 +19,7 @@ app.include_router(chat.router, prefix="/chat")
 app.include_router(websockets.router)
 app.include_router(html.router)
 app.include_router(recommendations.router)
+app.include_router(related.router)
 
 # Enable logging
 logging.basicConfig(

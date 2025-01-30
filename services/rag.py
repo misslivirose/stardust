@@ -5,6 +5,8 @@ from langchain_ollama import OllamaEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import numpy as np
 import faiss
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 # Path to store the serialized data
 PERSISTENCE_PATH = "./rag_persistence"
@@ -44,6 +46,7 @@ def chunk_pdf(pdf_path, chunk_size=1000):
         print(f"Error reading PDF file '{pdf_path}': {e}")
         return []
 
+# Augment a prompt
 def augment_prompt(query, embeddings, index, all_chunks, k=10):
     query_embedding = embeddings.embed_query(query)
     query_embedding_np = np.array(query_embedding, dtype="float32").reshape(1, -1)
@@ -87,6 +90,38 @@ def load_from_disk(filename):
             return pickle.load(f)
     except FileNotFoundError:
         return None
+
+def return_filepath(query, embeddings, index, all_chunks, k=10):
+    query_embedding = embeddings.embed_query(query)
+    query_embedding_np = np.array(query_embedding, dtype="float32").reshape(1, -1)
+
+    # Search FAISS index for the top-k closest embeddings
+    D, I = index.search(query_embedding_np, k)
+
+     # Mapping from chunk index to document filename
+    chunk_to_file = {}
+    for filename in os.listdir("./static/data"):
+         if filename.endswith(".pdf"):
+             pdf_path = os.path.join("./static/data", filename)
+             chunks = chunk_pdf(pdf_path)
+             for chunk in chunks:
+                 chunk_to_file[chunk] = filename  # Map chunk to its PDF file
+
+    # Count occurrences of each document in the retrieved chunks
+    doc_scores = {}
+    for i in I[0]:  # Iterate through retrieved chunk indices
+         chunk_text = all_chunks[i]
+         if chunk_text in chunk_to_file:
+             doc_name = chunk_to_file[chunk_text]
+             doc_scores[doc_name] = doc_scores.get(doc_name, 0) + 1
+
+    # Return the document with the highest occurrence count
+    if doc_scores:
+         best_document = max(doc_scores, key=doc_scores.get)
+         return best_document
+    else:
+         return None  # No match found
+
 
 def initialize_rag(rag_folder_path="./static/data", persist=True):
     print("Initializing RAG...")

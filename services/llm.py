@@ -1,7 +1,7 @@
 import requests
 import json
 from services.chat_history import chat_histories
-from services.rag import augment_prompt, initialize_rag
+from services.rag import augment_prompt, initialize_rag, return_filepath
 
 # Initialize RAG
 embeddings, index, all_chunks = initialize_rag()
@@ -49,3 +49,6 @@ def generate_response(query: str, room_id: str):
                             yield {"response": decoded_line}
                     except Exception as e:
                         yield {"error": f"Error parsing response: {str(e)}"}
+
+def get_related_doc(query: str):
+    return return_filepath(query, embeddings, index, all_chunks )

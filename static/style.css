@@ -222,6 +222,7 @@ body {
 textarea#user-input {
     width: calc(100% - 20px); /* Keeps the textarea inside the container */
     margin-top: 10px;
+    margin-left: 10px;
     padding: 10px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -231,6 +232,7 @@ textarea#user-input {
     box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.05);
     background-color: var(--message-bg);
     color: var(--text-color);
+    ma
 }
 
 .chat-logo {
@@ -311,6 +313,9 @@ button:hover {
     border-radius: 8px;
     background-color: var(--message-bg);
     margin-left: 10px;
+    bottom: 5px;
+    position: fixed;
+    width: 95%;
 }
 
 .suggestions-box h3 {

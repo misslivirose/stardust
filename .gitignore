@@ -2,3 +2,4 @@ __pycache__/
 .zed
 /static/data
 /rag_persistence
+.DS_Store

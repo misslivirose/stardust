@@ -1,5 +1,6 @@
 import { updateChatBox } from "./chatBox.js";
 import { updateSuggestions } from "./get_suggestions.js";
+import { updatePDFViewer } from "./getPDF.js";
 
 export async function sendQuery(queryInput, sessionId, roomId, friendlyName) {
   if (!queryInput) return;
@@ -57,8 +58,11 @@ export async function sendQuery(queryInput, sessionId, roomId, friendlyName) {
     // Ensure finalResponse is not empty before calling updateSuggestions
     if (rawResponse.trim().length > 0) {
       updateSuggestions(rawResponse);
+      updatePDFViewer(rawResponse);
     } else {
-      console.warn("Skipping updateSuggestions: rawResponse is empty");
+      console.warn(
+        "Skipping updateSuggestions and PDFViewer: rawResponse is empty",
+      );
     }
   } catch (error) {
     aiMessage.innerHTML += `<span style="color: red;">Error: ${error.message}</span>`;
